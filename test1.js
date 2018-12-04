@@ -241,6 +241,8 @@ let arr3 = ['high', 'impact', 'memes']
 arr3[1000] = 'supermemes'
 console.log(arr3.length) // will print 1001. wtf javascript?
 console.log(arr3[999]) // will print undefined.
+// arrays will have length set to the object with the highest index + 1.
+// also, if you increase or decrease the length directly, which you can, it will affect the actual length of array.
 
 /////////// FUNCTIONS ///////////
 // functions work similar to other programming languages. 0 to n arguments, return values, the works.
@@ -308,8 +310,10 @@ console.log(avgMachine.average.apply(input)) // will output NaN
 
 /// like we did earlier, we have defined a function without a name. that is an anonymous function.
 /// this allows us to create neat tricks.
-var meme = "lord"
-(function() { meme += " sandwich has returned" })();
+var meme = "lord";
+(function() {
+    meme = meme + " sandwich has returned" 
+})()
 console.log(meme)
 
 // what just happened? we exploited the fact that meme exists inside the anonymous function as well,
@@ -317,11 +321,176 @@ console.log(meme)
 
 // recursions are also allowed in javascript. but how do you recursively call anonymous functions?
 // the answer is simple. JS allows you to name them. pretty straightforward. what is also allows you to do:
-// YOU CAN NAME ALL RECURSIVE ANONYMOUS FUNCTIONS WITH THE SAME NAME. as in, the name is only available to its own scope.
-// TODO: FIX THIS BLOODY RECURSION
+// YOU CAN NAME ALL RECURSIVE ANONYMOUS FUNCTIONS WITH THE SAME NAME. 
+// this means that the name is only available to its own scope.
 var recursiveAdd = function recAdd(...args) {
-    if (args[args.length - 1] === undefined) return
+    var pop = args.pop()
+    if (pop == undefined) return 0
     var total = 0 // important for this to be VAR.
-    total += (args[args.length - 1] + recAdd.apply(null, args.pop())) // we cannot pass an array to ...args, must use apply
+    total += (pop + recAdd.apply(null, args)) // we cannot pass an array to ...args, must use apply
     return total
 }
+console.log(recursiveAdd.apply(null, [1,2,3,4,5,6]))
+
+// regarding apply - the first parameter is essentially the 'context', the block scope,
+// under which the function will run. you need to keep providing the null context so that it won't
+// assume the parent block scope and screw your runtime when recursively calling a function that is a variable.
+// however, in this example, it seems that it is mostly relevant 
+
+/////////// CUSTOM OBJECTS ///////////
+// in OOP, objects are data structures, and methods are operations pertaining to them. this is a class
+// in javascript, there is no such thing as a class. everything is still an object, 
+// so instead of creating what's called a class, javascript prefer to refer to functions as classes.
+
+/// For example, lets create a calculator that can add and subtract. we will give the calculator a name.
+function Calculator(name) {
+    return {
+        name: name,
+        add: function (x, y) {
+            return x + y
+        },
+        sub: function (x, y) {
+            return x - y
+        },
+        avg: function (...args){
+            var total = 0;
+            for (value of args) {
+                total += value
+            }
+            return total / args.length
+        },
+        getName: function (){
+            return this.name
+        }
+    }
+}
+// we can get the name ourselves, why do we need a function.
+// in this case, you're right, but to enact private properties we need closure, which we will learn later.
+let calc = Calculator("spicy memes calculator")
+console.log(calc.getName() + " addition : " + calc.add(5, 6)) // 11
+console.log(calc.getName() + " subtraction : " + calc.sub(5, 6)) // -1 
+console.log(calc.getName() + " average : " + calc.avg(5,6,7,3,36,47,47,45,53)) // 27.666 repeating
+
+// lets use the this keyword to create an object that doesnt require the return directive.
+// if we are using the this keyword to create a 'class', then js gives us the 'new' keyword to 
+// create an object, execute a function over it and bind its 'global object' to the 'this' context created.
+function Calculator2(name) { 
+    this.name= name
+    this.add = function (x, y) {
+        return x + y
+    }
+    this.sub = function (x, y) {
+        return x - y
+    }
+    this.avg = function (...args){
+        var total = 0;
+        for (value of args) {
+            total += value
+        }
+        return total / args.length
+    },
+    this.getName = function (){
+        return this.name
+    }
+}
+
+// here we are creating calculator 2 and using it just as well.
+calc = new Calculator2("non spicy meme calculator")
+console.log(calc.getName() + " addition : " + calc.add(5, 6)) // 11
+console.log(calc.getName() + " subtraction : " + calc.sub(5, 6)) // -1 
+console.log(calc.getName() + " average : " + calc.avg(5,6,7,3,36,47,47,45,53)) // 27.666 repeating
+
+// but in both cases, we re-created the function we already wrote. we want reusability, after all.
+// what we can do, is define those functions inside variables, just as we did previously.
+// but we dont want the same functions to exist in memory, over and over. so what do we do?
+// the answer is simple. we use PROTOTYPE. prototype is an object shared across all objects of the same type.
+//
+// it is part of what's called a lookup chain- aptly named prototype chain.
+// javascript will attempt to look into references inside that chain if the property isnt defined in 'this'.
+// OBSERVE. MEME CALCUALTOR VERSION 3
+function Calculator3(name) { 
+    this.name= name
+}
+// function definition
+Calculator3.prototype.add = function (x, y) {
+    return x + y
+}
+Calculator3.prototype.sub = function (x, y) {
+    return x - y
+}
+Calculator3.prototype.avg = function (...args){
+    var total = 0;
+    for (value of args) {
+        total += value
+    }
+    return total / args.length
+},
+Calculator3.prototype.getName = function (){
+    return this.name
+}
+
+/// THIS VERY POWERFUL for this means you can add functions to ALL OBJECTS OF THE SAME TYPE AT RUNTIME.
+/// you can even CHANGE EXISTING PROPERTIES in the prototype. a func can mean x but actually do y
+/// YOU CAN EVEN ADD METHODS TO EXISTING JS TYPES / LITERALS!!!
+Array.prototype.hohe = function() {
+    console.log("hiho hehe")
+};
+['some xd'].hohe()
+
+/// simulating simple inheritance with call()
+// apply() has a sister function, call(), which accepts arguments individually rather than an array of them.
+// that is why, usually, you'll want to use call() in this use case. defining an array is unnecessary,
+// otherwise the functions are similar to each other in function
+//
+// for instance we will define the animal 'class' and have dog and cat 'inherit' from it using call.
+function Animal (name, sound) {
+    this.name = name
+    this.sound = sound
+}
+// here we define the other animals
+function Dog(name, sound, hasBone) {
+    Animal.call(this, name, sound)
+    this.hasBone = hasBone
+}
+Dog.prototype.throwBone = function () {
+    this.hasBone = false
+}
+Dog.prototype.getBone = function () {
+    this.hasBone = true
+}
+
+function Cat(name, sound, evilLevel) {
+    Animal.call(this, name, sound)
+    this.evilLevel = evilLevel
+}
+
+Cat.prototype.goApeShit = function () {
+    this.evilLevel = 'MAXIMUM EVIL'
+}
+Cat.prototype.goToSleep = function () {
+    this.evilLevel = 'GET OFF ME'
+}
+
+// we can also use call on function literals. example (on a non literal, to show that we can):
+let cats = [new Cat('mizi', 'meow', 'purr'), new Cat('darkness incarnate', 'mrrrow', 'MAXIMUM EVIL')]
+cats.forEach(function (cat) {
+    Cat.prototype.goToSleep.call(cat)
+    console.log(cat.toString())
+})
+
+/// another great feature functions have, is the ability to nest themselves.
+/// this allows for scope manipulation that gives the following advantages:
+/// 1. if you function contains small specialized functions that are not useful to any other part
+//     of your code, then you might as well define them inside the parent instead of 'globally'
+/// 2. same goes for variables that you need across functions - instead of defining them 'globally'
+///    you can simply use a parent scope that is shared across those unique-usecase-utility functions.
+///
+/// 3. it does not matter if you use var or let in this simple case. here we used an anonymous function.
+function util1 () {
+    let specialxd = 'xd';
+    (function util2 () {
+        console.log(specialxd)
+    })() 
+}
+
+util1() // outputs 'xd'
