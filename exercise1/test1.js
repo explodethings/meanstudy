@@ -1,7 +1,7 @@
 // With great responsibility, comes great gaps in knowledge.
 /////////// NUMBERS ////////////
-console.log(Math.sin(3.5))
-let circum = (2 * Math.PI * 5)
+console.log(Math.sin(3.5));
+var circum = (2 * Math.PI * 5)
 console.log(circum)
 
 // Always converts to integer, base 10 values.
@@ -12,7 +12,7 @@ console.log(parseInt('0x56A'))
 console.log(+ '0x16')
 
 // outputs NaN - especially when used in arithmetic
-let nan = parseInt('xd') + 5 * 2 - 5
+var nan = parseInt('xd') + 5 * 2 - 5
 console.log(isNaN(nan))
 
 // Infinity and -Infinity is also defined.
@@ -23,13 +23,13 @@ console.log(isFinite(nan)) // or any Inf/-Inf value
 /////////// STRINGS ////////////
 // Strings are UTF-16, and not UTF-8
 // Strings can be NATIVELY used as objects.
-let str = 'meme'
+var str = 'meme'
 console.log(str.charAt(2)) // returns char at 0 to length range
 console.log(str.replace('mem', 'thinkvantag')) // thinkvantage
 console.log('meme'.toUpperCase()) // MEME (replace returns the string from its scope)
 
 /////////// OTHER TYPES ////////////
-let nullval = null
+var nullval = null
 let undefval = undefined
 
 // Important : Some javascript conversions are considered 'true' or 'false',
@@ -49,8 +49,14 @@ console.log("nullvall is explicitly : " + Boolean(nullval)) // false
 for (let index = 0; index < 2; index++) {
     console.log("index : " + index)
 }
-try { console.log("index : " + index) } // will trigger an exception
-catch { console.log("index is a let variable, as such, unavailable from outside the loop.") }
+try 
+{ 
+    console.log("index : " + index) 
+}
+catch 
+{
+    console.log("index is a let variable, as such, unavailable from outside the loop.") 
+}
 // turns out if you reuse the same name for loops and use 'var' instead of let,
 // the variable will be 'undefined' rather than caught in the exception, thus printed.
 // it is important to ensure you use let for all loops.
