@@ -1,0 +1,72 @@
+.calculator {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    grid-gap: 10px;
+    grid-template-areas: "header  header"
+                         "title  sidebar"
+                         "main   sidebar"
+                         "footer footer";
+    margin: 20px;
+    padding: 10px;
+    border: solid 2px #000
+}
+.calculator::before {
+    content:"grand calculator of memes";
+    position: absolute;
+    left: 20px;
+    top: 2px;
+    font-weight: bold;
+    font-family: arial;
+}
+.calculator > *{padding:30px; color:#fff; font-size:20px;}
+/* .block {
+    font-size: 30px;
+    height: 200px; 
+    line-height: 200px;
+    text-align: center;
+} */
+.master-header {
+    background: beige;
+    grid-area: header;
+}
+.page-title {
+    background: cyan;
+    grid-area: title;
+}
+.main-content {
+    background: crimson;
+    grid-area: main;
+    min-height: 500px;
+}
+.sidebar {
+    background: greenyellow;
+    grid-area: sidebar;
+}
+.footer {
+    background: violet;
+    grid-area: footer;
+}
+.common-list {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-gap: 10px;
+    list-style-type: none;
+}
+.common-list-item {
+    background: blue;
+    color: #fff;
+    font-size: 30px;
+    height: 200px; 
+    line-height: 200px;
+    text-align: center;
+}
+.expand {
+    grid-column: 2/span 2;
+    grid-row: 3/4;
+}
+
+@media (max-width:590px) {
+    .common-list {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
