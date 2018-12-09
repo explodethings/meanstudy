@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<!-- saved from url=(0049)file:///C:/Projects/meanstudy/exercise2/oojs.html -->
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>Object-oriented JavaScript example</title>
+    </head>
+    <body>
+        <p>This example requires you to enter commands in your browser's JavaScript console (see <a href="https://developer.mozilla.org/en-US/docs/Learn/Common_questions/What_are_browser_developer_tools">What are browser developer tools</a> for more information).</p>
+        <p>There is a variable here that is defined with an object literal. its name is 'person'. use F12 to explore bob and his love for murder and ponies.</p>
+        <script>
+            var person = {
+                name: ['Bob', 'Smith'],
+                age: 32,
+                gender: 'apache helicopter',
+                interests: ['murder', 'ponies'],
+                bio: function() {
+                    alert(this.name[0] + ' ' + this.name[1] +
+                          ' is ' + this.age + ' years old. He likes ' +
+                           this.interests[0] + ' and ' + this.interests[1] + '.')
+                },
+                greeting: function() {
+                    alert("Hi! I'm " + this.name[0] + ".")
+                }
+            }
+        </script>
+    </body>
+</html>
