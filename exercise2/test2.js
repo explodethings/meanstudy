@@ -14,6 +14,16 @@ maymay = ":))))"
 console.log(meme + " " + maymay)
 var maymay;
 
+/// hoisting also occurs with function literals.
+/// for example if i were to define:
+function foo() {
+    console.log('bar')
+}
+/// the following would be hoisted as a variable:
+var foo = function () {
+    console.log('bar')
+}
+
 ////////// CLOSURE //////////
 /// here we will define what a closure is. but before that, we will define
 /// whats called lexical scoping.
