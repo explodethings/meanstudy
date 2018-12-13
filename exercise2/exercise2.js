@@ -1,9 +1,8 @@
 // exercise2.js is the calculator function list
 // variables
-var OPLeft = ""
-var OPRight = ""
-var OPCurrent = ""
-var isDecimal = ""
+var OPLeft = ''
+var OPRight = '0'
+var OPCurrent = ''
 // variables : DOM elements
 var operations = document.querySelectorAll('.op')
 var numbers = document.querySelectorAll('.num')
@@ -30,20 +29,11 @@ function UpdateScreen(numToShow) {
 }
 
 function decimalSeperator() {
-    // flag the decimal
-    isDecimal = '.'
     // disable the ability to add more dots, this isnt an ip address
     disableButton(decimal, true)
-    // if we dont have a right operand-
-    if (!OPRight) {
-        // present a 0 with a dot
-        UpdateScreen('0' + isDecimal)
-    }
-    // otherwise-
-    else {
-        // apply the decimal normally
-        UpdateScreen(OPRight + isDecimal)
-    }
+    // apply the decimal normally
+    OPRight += '.'
+    UpdateScreen(OPRight)
 }
 
 function changeClear(clearState) {
@@ -76,13 +66,11 @@ function Clear(clearState) {
 }
 
 function Operand(num) {
-    // always try to add decimal point to number, and then make isDecimal empty (falsy)
-    num = isDecimal + num
-    isDecimal = ''
-    // add the strings together and parse it into a floating point number
+    // add the strings together and parse it into a floating point number,
+    // then reconverted into a string to correct string-based-number-representations
     OPRight += num
     OPRight = parseFloat(OPRight).toString()
-    // enable clear right (we can clear zero as well) and enable operations
+    // enable clear right and enable operations
     changeClear('C')
     disableButtons(operations, false)
     // update screen
@@ -98,6 +86,12 @@ function Operation(sign) {
 
     // if we have an operation and a left operand stored-
     if (OPCurrent && OPLeft) {
+        // if we did not input a right operand yet-
+        if (!OPRight) {
+            // update the sign and return
+            OPCurrent = sign
+            return
+        }
         // parse both operands
         let Left = parseFloat(OPLeft)
         let Right = parseFloat(OPRight)
@@ -121,8 +115,6 @@ function Operation(sign) {
         OPLeft = OPResult.toString()
         // next operation is stored
         OPCurrent = sign
-        // right operand is cleared
-        OPRight = ""
         // screen is updated with left operand
         UpdateScreen(OPLeft)
         // if we have an operation after this one-
@@ -144,15 +136,21 @@ function Operation(sign) {
     }
     // otherwise-
     else {
+        // if our right operand is empty, populate it with a zero.
+        if (!OPRight) {
+            OPRight = '0'
+        }
         // move right to left and clear right, set operation-
-        OPLeft = OPRight
+        // if OPLeft is null, put the right operand to be the left one.
+        OPLeft = OPLeft || OPRight
         OPCurrent = sign
-        OPRight = ""
         // enable right operand input, disable operations
         disableButtons(numbers, false)
-        disableButtons(operations, true)
         disableButton(decimal, false)
+        disableButton(result, true)
     }
+    // clear right operand
+    OPRight = ''
 }
 
 // function event bindings
