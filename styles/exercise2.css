@@ -38,7 +38,6 @@ button:disabled {
                          ".      .      .      result";
 }
 .calculator > * {
-    display: flex;
     padding: 20px;
     color:black;
     background: white;

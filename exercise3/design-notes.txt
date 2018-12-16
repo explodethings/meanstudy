@@ -1,0 +1,24 @@
+the cookbook:
+
+to be honest, what i would like to happen, is that a small backend will host the users
+database to constant memory, where the 'front-end' js can access it.
+
+so i have a few choices:
+1. node the users
+2. make every browser load all the users
+
+obviously, the first choice is better. now how do i handle users?
+1. have all users populate a single json
+2. have a unique json for every user
+
+option 2 seems better. seems like im going to have to use jsons as if i were constructing
+my own little mongodb. after careful reading of a few key concepts regarding how mongo works,
+i am more confident with going the following:
+
+1. make a collection for users
+2. make a collection for recipes
+
+fortunately, the cookbook is shared across users. means only one cookbook, and no need
+to create a data model many-to-many. the users collection will be accessed once, 
+and the recipes collection will be accessed many times, but their access is not bound
+together in a way that would require them to work together.
