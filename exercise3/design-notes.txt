@@ -1,3 +1,5 @@
+256, 384
+
 the cookbook:
 
 to be honest, what i would like to happen, is that a small backend will host the users
@@ -22,3 +24,9 @@ fortunately, the cookbook is shared across users. means only one cookbook, and n
 to create a data model many-to-many. the users collection will be accessed once, 
 and the recipes collection will be accessed many times, but their access is not bound
 together in a way that would require them to work together.
+
+cookbook site design:
+
+given the fact that im using bootstrap, im going to leverage key features like navbars, table 
+system etc to deliver the best cookbook i can make.
+
