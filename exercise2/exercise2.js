@@ -34,6 +34,7 @@ function decimalSeperator() {
     // apply the decimal normally
     OPRight += '.'
     UpdateScreen(OPRight)
+    disableButtons(numbers, false)
 }
 
 function changeClear(clearState) {
@@ -52,6 +53,7 @@ function Clear(clearState) {
             OPRight = ''
             UpdateScreen('0')
             changeClear('AC')
+            disableButton(decimal, false)
             break
         // clear left operand
         case 'AC':
@@ -68,8 +70,16 @@ function Clear(clearState) {
 function Operand(num) {
     // add the strings together and parse it into a floating point number,
     // then reconverted into a string to correct string-based-number-representations
-    OPRight += num
-    OPRight = parseFloat(OPRight).toString()
+    tempNum = OPRight + num
+    tempString = parseFloat(tempNum).toString()
+    // if there is a decimal point and we want to add a zero to make the number smaller,
+    if (tempString !== tempNum && decimal.disabled === true) {
+        // otherwise, we will parse normally.
+        OPRight = tempNum
+    }
+    else {
+        OPRight = tempString
+    }
     // enable clear right and enable operations
     changeClear('C')
     disableButtons(operations, false)
@@ -120,15 +130,16 @@ function Operation(sign) {
         // if we have an operation after this one-
         if (OPCurrent) { 
             // allow the user to input right operand, and disable result button
-            disableButtons(operations, true)
             disableButtons(numbers, false)
             disableButton(result, true)
+            disableButton(decimal, false)
         }
         // otherwise-
         else { 
             // require user to request operation or clear memory
             disableButtons(operations, false)
             disableButtons(numbers, true)
+            disableButton(decimal, true)
             changeClear('AC')
         }
         // disable the result button
