@@ -72,12 +72,14 @@ function Operand(num) {
     // then reconverted into a string to correct string-based-number-representations
     tempNum = OPRight + num
     tempString = parseFloat(tempNum).toString()
-    // if there is a decimal point and we want to add a zero to make the number smaller,
+    // if the number has changed-
     if (tempString !== tempNum && decimal.disabled === true) {
-        // otherwise, we will parse normally.
+        // finalize the number as the right operand
         OPRight = tempNum
     }
+    // otherwise, we have a leading zero
     else {
+        // the right operand is equal to the parsed number from parseFloat
         OPRight = tempString
     }
     // enable clear right and enable operations
@@ -129,14 +131,16 @@ function Operation(sign) {
         UpdateScreen(OPLeft)
         // if we have an operation after this one-
         if (OPCurrent) { 
-            // allow the user to input right operand, and disable result button
+            // allow the user to input right operand, and disable result button,
+            // and also allow to input decimals.
             disableButtons(numbers, false)
             disableButton(result, true)
             disableButton(decimal, false)
         }
         // otherwise-
         else { 
-            // require user to request operation or clear memory
+            // require user to request operation or clear memory.
+            // disable ability to input decimals.
             disableButtons(operations, false)
             disableButtons(numbers, true)
             disableButton(decimal, true)
@@ -155,7 +159,7 @@ function Operation(sign) {
         // if OPLeft is null, put the right operand to be the left one.
         OPLeft = OPLeft || OPRight
         OPCurrent = sign
-        // enable right operand input, disable operations
+        // enable right operand input, disable operations, enable decimal
         disableButtons(numbers, false)
         disableButton(decimal, false)
         disableButton(result, true)
