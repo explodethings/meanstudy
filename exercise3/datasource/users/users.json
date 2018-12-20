@@ -1,7 +1,0 @@
-{
-    "userName": "admin",
-    "passHash": "5d994adeb2204fb7c05367d1c7a2fcf4f2fe3ae505e438ac188c7ff230e8e0c8dbdcd36cb1c96399cd0021268dcd42fe",
-    "roles": [ "admin", "user" ],
-    "displayName": "Administration Guy",
-    "numCreated": "3"
-}

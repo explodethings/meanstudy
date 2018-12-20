@@ -1,4 +1,5 @@
-{
+[
+    {
     "recipeName": "Cast Iron Chicken Breast",
     "timeToPrepare": "20m",
     "timeToCook": "20m",
@@ -7,7 +8,7 @@
     "calories": "it's over 9000!!!",
     "rating": [],
     "usersMade": [],
-    "media": [],
+    "media": [ "images/chicken-breast.jpg" ],
     "ingridients": {
         "Chicken Breast" : "1",
         "Pepper" : "1/2 Cup",
@@ -31,4 +32,5 @@
         "Repeat steps 8-10 until you've cooked all of your meat."
     ],
     "serving": "To serve the meat, you are suggested to apply mayonnaise and mustard in the plate- alongside the meat. You may also serve with vegetables and tea. This should not take more than 5 minutes, unless you have a side dish to serve (uncovered here)."
-}
+    }
+]
