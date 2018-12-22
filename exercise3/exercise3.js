@@ -34,6 +34,8 @@ selectDB(recipesPath, function(response) {
 function populateCookbook() {
   // create recipes 
   // calculate amount of rows - if there is remainder, do one more row
+  // reset rowsHolder
+  rowsHolder = []
   var currRecipeNum = 0
   var currRowNum = 1
   var numOfRows = 
@@ -60,8 +62,7 @@ function populateCookbook() {
       // edit the elements
       // image
       img.attr('src', recipesData[currRecipeNum]['media'][0])
-      img.attr('width', 250)
-      img.attr('height', 225)
+      img.attr('class', 'img-responsive')
 
       // header
       h4.html(recipesData[currRecipeNum]['recipeName'])
@@ -74,18 +75,16 @@ function populateCookbook() {
              'Calories: ' + recipesData[currRecipeNum]['calories'] + '<br>')
       
       // append the elements
-      row.append(column)
-      column.append(recipeCard)
       recipeCard.append(img)
       recipeCard.append(h4)
       recipeCard.append(p)
+      column.append(recipeCard)
+      row.append(column)
       currRowNum++
       currRecipeNum++
     }
     // ensure dom finished loading with $
-    $(function() {
-      row.appendTo('.cookbook')
-    })
+    $('.cookbook').append(row)
   }
 }
 
@@ -94,7 +93,9 @@ function userAccessControl() {
   if (window.sessionStorage.userName) {
     $('.user').hide();
     $('#user-greet').text('Hello ' + window.sessionStorage.userName + '!');
-    $('#show-cookbook').load('html/cookbook.html', populateCookbook());
+    $('#show-cookbook').load('html/cookbook.html', function() {
+      populateCookbook();
+    })
   } else {
     $('.guest').hide();
     $('#user-greet').text('Hello Guest!');
@@ -118,6 +119,6 @@ function userAccessControl() {
 }
 
 $(document).ready(function() {
-  $('#nav-temp').load('html/nav.html', userAccessControl);
+  $('#nav-temp').load('html/nav.html', userAccessControl)
 });
 

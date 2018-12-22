@@ -1,0 +1,19 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Launch *.html",
+            "type": "chrome",
+            "request": "launch",
+            "file": "${workspaceFolder}/exercise3/exercise3.html",
+            "url": "http://localhost:8080",
+            "port": 9222,
+            "webRoot": "${workspaceFolder}/exercise3",
+            "runtimeExecutable": "C:\\Users\\Kirill\\AppData\\Local\\Chromium\\Application\\chrome.exe",
+            "runtimeArgs": [ "--allow-file-access-from-files", "--remote-debugging-port=9222" ]
+        }
+    ]
+}
