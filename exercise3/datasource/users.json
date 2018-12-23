@@ -3,7 +3,6 @@
     "username": "admin",
     "password": "Aa123456",
     "roles": [ "admin", "user" ],
-    "displayName": "Administration Guy",
-    "numCreated": "3"
+    "displayName": "Administration Guy"
     }
 ]

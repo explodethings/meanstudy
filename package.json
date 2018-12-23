@@ -1,0 +1,28 @@
+{
+  "name": "meanstudy",
+  "version": "1.0.0",
+  "description": "\"# meanstudy\"",
+  "main": "test1.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/explodethings/meanstudy.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/explodethings/meanstudy/issues"
+  },
+  "homepage": "https://github.com/explodethings/meanstudy#readme",
+  "devDependencies": {
+    "eslint": "^5.9.0",
+    "eslint-config-google": "^0.11.0",
+    "esprima": "^4.0.1"
+  },
+  "dependencies": {
+    "crypto-js": "^3.1.9-1",
+    "jquery": "^3.3.1"
+  }
+}

@@ -1,7 +1,17 @@
 /* eslint-disable require-jsdoc */
 /* eslint-disable no-var */
 var usersData, recipesData
-const columnNumber = 4
+const cookbookColNum = 4
+
+function updateDatabase() {
+  window.sessionStorage.setItem('usersData', JSON.stringify(usersData))
+  window.sessionStorage.setItem('recipesData', JSON.stringify(recipesData))
+}
+
+function readDatabase() {
+  usersData = JSON.parse(window.sessionStorage['usersData'])
+  recipesData = JSON.parse(window.sessionStorage['recipesData'])
+}
 
 // db path
 const usersPath = 'datasource\\users.json';
@@ -19,14 +29,6 @@ function selectDB(filePath, callback) {
   XMLHTTPReq.send(null)
 }
 
-// read database from disk
-selectDB(usersPath, function(response) {
-  usersData = JSON.parse(response)
-})
-selectDB(recipesPath, function(response) {
-  recipesData = JSON.parse(response)
-})
-
 function combineInstructions(instructions) {
   var combined = ""
   for (let index = 0; index < instructions.length; index++) {
@@ -35,29 +37,56 @@ function combineInstructions(instructions) {
   return combined
 }
 
-function recipePage(recipeData) {
-  var instructions = combineInstructions(recipesData[$(recipeData).attr('id')]['instructions'])
-  $('.recipePage').html(instructions)
+// columns are hardcoded here
+function recipePage(recipeID) {
+  const numOfIngridients = recipesData[recipeID]['ingridients'].length
+  const numOfInstructions = recipesData[recipeID]['instructions'].length 
+  var currIngridientNum = 0,
+      currIngridientCol = 1
+  const numOfIngridientRows = 
+    Math.floor((numOfIngridients / 3) + (numOfIngridients % 3 ? 1 : 0))
+  
+  // ingridients first
+  for (let index = 0; index < numOfIngridientRows; index++) {
+    var row = $(document.createElement('div'))
+    row.attr('class', 'row')
+    
+    while ((currIngridientNum !== numOfIngridients) && (currIngridientCol % (3 + 1) !== 0)) {
+      var colStep = $(document.createElement('div'))
+      colStep.attr('class', 'col-md-1')
+      colStep.html('<span class="glyphicon glyphicon-plus"></span>')
+      
+      var colIngridient = $(document.createElement('div'))
+      colIngridient.attr('class', 'col-md-2')
+      colIngridient.html(recipesData[recipeID]['instructions'])
+    }
+  }
+
+  //var instructions = combineInstructions(recipesData[recipeID]['instructions'])
+  //$('.recipePage').html(instructions)
+  var newPage = window.open()
+}
+
+function addRecipe() {
+
 }
 
 function populateCookbook() {
   // create recipes 
   // calculate amount of rows - if there is remainder, do one more row
-  // reset rowsHolder
-  rowsHolder = []
-  var currRecipeNum = 0
-  var currRowNum = 1
-  var numOfRows = 
-    (Math.floor(recipesData.length / columnNumber)) + ((recipesData.length % columnNumber) ? 1 : 0)
+  var currRecipeNum = 0,
+      currColNum = 1
+  const numOfRows = 
+    (Math.floor(recipesData.length / cookbookColNum)) + ((recipesData.length % cookbookColNum) ? 1 : 0)
   for (let index = 0; index < numOfRows; index++) {
     // create row
     var row = $(document.createElement('div'))
     row.attr('class', 'row')
-    currRowNum = 1
-    while ((currRecipeNum !== recipesData.length) && (currRowNum % 5 !== 0)) {
+    currColNum = 1
+    while ((currRecipeNum !== recipesData.length) && (currColNum % (cookbookColNum + 1) !== 0)) {
       // create column
       var column = $(document.createElement('div'))
-      column.attr('class', 'col-md-' + Math.floor(12 / columnNumber))
+      column.attr('class', 'col-md-' + Math.floor(12 / cookbookColNum) + ' text-center')
 
       // create recipe card
       var recipeCard = $(document.createElement('div'))
@@ -70,16 +99,21 @@ function populateCookbook() {
       recipeLink.attr('href', '#')
       recipeLink.on('click', function() {
         window.open('html/recipe.html', $('.recipe'))
-        recipePage(this)
+        recipePage($(this).attr('id'))
       })
       
       // delete recipe card button
       var delBtn = $(document.createElement('button'))
-      delBtn.attr('class', 'btn-danger')
+      delBtn.attr('class', 'btn-danger center-block')
+      delBtn.attr('type', 'button')
       delBtn.html('<h4>Delete Recipe</h4>')
       delBtn.attr('id', currRecipeNum)
       delBtn.on('click', function() {
-        $('div#' + ($(this).attr('id')) + '.recipe').parent().hide()
+        //$('div#' + ($(this).attr('id')) + '.recipe').parent().hide()
+        recipesData.splice($(this).attr('id'), 1)
+        $(this).parent().parent().remove()
+        updateDatabase()
+        readDatabase()
       })
 
       // create recipe card elements
@@ -109,7 +143,7 @@ function populateCookbook() {
       recipeCard.append(delBtn)
       column.append(recipeCard)
       row.append(column)
-      currRowNum++
+      currColNum++
       currRecipeNum++
     }
     // ensure dom finished loading with $
@@ -121,14 +155,26 @@ function populateCookbook() {
 function userAccessControl() {
   if (window.sessionStorage.userName) {
     $('.user').hide();
-    $('#user-greet').text('Hello ' + window.sessionStorage.userName + '!');
+    $('#nav-addrecipe').on('click', function() {
+
+    })
+    $('#user-greet').text('Hello ' + window.sessionStorage.userName + '!')
     $('#show-cookbook').load('html/cookbook.html', function() {
-      populateCookbook();
+      readDatabase()
+      populateCookbook()
     })
   } else {
+    // read database from disk if guest acc
+    selectDB(usersPath, function(response) {
+      window.sessionStorage.setItem('usersData', response)
+    })
+    selectDB(recipesPath, function(response) {
+      window.sessionStorage.setItem('recipesData', response)
+      readDatabase()
+    })
     $('.guest').hide();
-    $('#user-greet').text('Hello Guest!');
-    $('#greet-guest').load('html/guest.html');
+    $('#user-greet').text('Hello Guest!')
+    $('#greet-guest').load('html/guest.html')
     $('#login-screen').load('html/login.html', function() {
       $('#login-form').on('submit', function() {
         for (user of usersData) {
