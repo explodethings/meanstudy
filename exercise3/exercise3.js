@@ -7,10 +7,6 @@ const columnNumber = 4
 const usersPath = 'datasource\\users.json';
 const recipesPath = 'datasource\\recipes.json';
 
-function updateDB(db, path) {
-
-}
-
 function selectDB(filePath, callback) {
   var XMLHTTPReq = new XMLHttpRequest()
   XMLHTTPReq.overrideMimeType('application/json')
@@ -30,6 +26,19 @@ selectDB(usersPath, function(response) {
 selectDB(recipesPath, function(response) {
   recipesData = JSON.parse(response)
 })
+
+function combineInstructions(instructions) {
+  var combined = ""
+  for (let index = 0; index < instructions.length; index++) {
+    combined += ((index + 1) + ". " + instructions[index] + "<br>")
+  }
+  return combined
+}
+
+function recipePage(recipeData) {
+  var instructions = combineInstructions(recipesData[$(recipeData).attr('id')]['instructions'])
+  $('.recipePage').html(instructions)
+}
 
 function populateCookbook() {
   // create recipes 
@@ -53,6 +62,25 @@ function populateCookbook() {
       // create recipe card
       var recipeCard = $(document.createElement('div'))
       recipeCard.attr('class', 'recipe')
+      recipeCard.attr('id', currRecipeNum)
+
+      // create link segments
+      var recipeLink = $(document.createElement('a'))
+      recipeLink.attr('id', currRecipeNum)
+      recipeLink.attr('href', '#')
+      recipeLink.on('click', function() {
+        window.open('html/recipe.html', $('.recipe'))
+        recipePage(this)
+      })
+      
+      // delete recipe card button
+      var delBtn = $(document.createElement('button'))
+      delBtn.attr('class', 'btn-danger')
+      delBtn.html('<h4>Delete Recipe</h4>')
+      delBtn.attr('id', currRecipeNum)
+      delBtn.on('click', function() {
+        $('div#' + ($(this).attr('id')) + '.recipe').parent().hide()
+      })
 
       // create recipe card elements
       var img = $(document.createElement('img'))
@@ -69,15 +97,16 @@ function populateCookbook() {
       h4.attr('style', 'font-size: 1.33em')
 
       // description
-      p.html('Time to prepare: ' + recipesData[currRecipeNum]['timeToPrepare'] + '<br>' +
-             'Time to cook: ' + recipesData[currRecipeNum]['timeToCook'] + '<br>' +
+      p.html('Recipe Time: ' + recipesData[currRecipeNum]['timeToPrepare'] + '<br>' +
              'Servings: ' + recipesData[currRecipeNum]['servings'] + '<br>' +
              'Calories: ' + recipesData[currRecipeNum]['calories'] + '<br>')
       
       // append the elements
-      recipeCard.append(img)
-      recipeCard.append(h4)
+      recipeCard.append(recipeLink)
+      recipeLink.append(img)
+      recipeLink.append(h4)
       recipeCard.append(p)
+      recipeCard.append(delBtn)
       column.append(recipeCard)
       row.append(column)
       currRowNum++
