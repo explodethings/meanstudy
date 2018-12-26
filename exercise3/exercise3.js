@@ -1,7 +1,21 @@
 /* eslint-disable require-jsdoc */
 /* eslint-disable no-var */
 var usersData, recipesData
+   ,currPage
+   ,recipeNum
 const cookbookColNum = 4
+     ,usersPath = 'datasource\\users.json'
+     ,recipesPath = 'datasource\\recipes.json'
+
+function loadDatabase() {
+  selectDB(usersPath, function(response) {
+    window.sessionStorage.setItem('usersData', response)
+  })
+  selectDB(recipesPath, function(response) {
+    window.sessionStorage.setItem('recipesData', response)
+    readDatabase()
+  })
+}
 
 function updateDatabase() {
   window.sessionStorage.setItem('usersData', JSON.stringify(usersData))
@@ -12,10 +26,6 @@ function readDatabase() {
   usersData = JSON.parse(window.sessionStorage['usersData'])
   recipesData = JSON.parse(window.sessionStorage['recipesData'])
 }
-
-// db path
-const usersPath = 'datasource\\users.json';
-const recipesPath = 'datasource\\recipes.json';
 
 function selectDB(filePath, callback) {
   var XMLHTTPReq = new XMLHttpRequest()
@@ -29,20 +39,12 @@ function selectDB(filePath, callback) {
   XMLHTTPReq.send(null)
 }
 
-function combineInstructions(instructions) {
-  var combined = ""
-  for (let index = 0; index < instructions.length; index++) {
-    combined += ((index + 1) + ". " + instructions[index] + "<br>")
-  }
-  return combined
-}
-
-// columns are hardcoded here
-function recipePage(recipeID) {
-  const numOfIngridients = recipesData[recipeID]['ingridients'].length
+// this is a callback function for the load invocation in recipePage
+function generateRecipePage(recipeID) {
+  const ingridients = Object.keys(recipesData[recipeID]['ingridients'])
+  const numOfIngridients = ingridients.length
   const numOfInstructions = recipesData[recipeID]['instructions'].length 
-  var currIngridientNum = 0,
-      currIngridientCol = 1
+  var currIngridientNum = 0, currIngridientCol
   const numOfIngridientRows = 
     Math.floor((numOfIngridients / 3) + (numOfIngridients % 3 ? 1 : 0))
   
@@ -50,22 +52,58 @@ function recipePage(recipeID) {
   for (let index = 0; index < numOfIngridientRows; index++) {
     var row = $(document.createElement('div'))
     row.attr('class', 'row')
+
+    // reset counter
+    currIngridientCol = 1
     
     while ((currIngridientNum !== numOfIngridients) && (currIngridientCol % (3 + 1) !== 0)) {
       var colStep = $(document.createElement('div'))
       colStep.attr('class', 'col-md-1')
-      colStep.html('<span class="glyphicon glyphicon-plus"></span>')
+      colStep.html('<span class="glyphicon glyphicon-plus"></span>' + 
+                    recipesData[recipeID]['ingridients'][ingridients[currIngridientNum]])
       
       var colIngridient = $(document.createElement('div'))
       colIngridient.attr('class', 'col-md-2')
-      colIngridient.html(recipesData[recipeID]['instructions'])
+      colIngridient.html(ingridients[index])
+
+      row.append(colStep)
+      row.append(colIngridient)
+
+      currIngridientNum++
+      currIngridientCol++
     }
+    $('.ingridients').append(row)
   }
 
-  //var instructions = combineInstructions(recipesData[recipeID]['instructions'])
-  //$('.recipePage').html(instructions)
-  var newPage = window.open()
+  // instructions
+  for (let index = 0; index < numOfInstructions; index++) {
+    var row = $(document.createElement('div'))
+    row.attr('class', 'row')
+
+    var colStep = $(document.createElement('div'))
+    colStep.attr('class', 'col-md-2')
+    colStep.html('<h3>' + (index + 1) + '.</h3>')
+    
+    var colInstruction = $(document.createElement('div'))
+    colInstruction.attr('class', 'col-md-8')
+    colInstruction.html(recipesData[recipeID]['instructions'][index])
+
+    row.append(colStep)
+    row.append(colInstruction)
+    $('.instructions').append(row)
+  }
 }
+
+// columns are hardcoded here
+function recipePage(recipeID) {
+  clearAllTags()
+  $('#recipe-page').load('html/recipe.html', function() {
+    generateRecipePage(recipeID)
+  })
+}
+
+//var instructions = combineInstructions(recipesData[recipeID]['instructions'])
+//$('.recipePage').html(instructions)
 
 function addRecipe() {
 
@@ -98,7 +136,8 @@ function populateCookbook() {
       recipeLink.attr('id', currRecipeNum)
       recipeLink.attr('href', '#')
       recipeLink.on('click', function() {
-        window.open('html/recipe.html', $('.recipe'))
+        window.sessionStorage['recipePage'] = 'recipePage'
+        recipeNum = $(this).attr('id')
         recipePage($(this).attr('id'))
       })
       
@@ -151,49 +190,82 @@ function populateCookbook() {
   }
 }
 
+function clearAllTags() {
+  $('body').children().each(function () {
+    if (!(this.id === 'nav-temp')) {
+      this.innerHTML = ''
+    }
+  })
+}
+
+function userLogin() {
+  $('.user').hide();
+  $('#user-greet').text('Hello ' + window.sessionStorage.userName + '!')
+  $('#nav-addrecipe').on('click', function() {
+
+  })
+  $('#nav-cookbook').on('click', function() {
+    window.sessionStorage['recipePage'] = ''
+    clearAllTags()
+    showCookbook()
+  })
+}
+
+function pageRedirector() {
+  
+}
+
+function guestLogin() {
+  $('.guest').hide();
+  $('#user-greet').text('Hello Guest!')
+  $('#greet-guest').load('html/guest.html')
+  $('#login-screen').load('html/login.html', function() {
+    $('#login-form').on('submit', function() {
+      for (user of usersData) {
+        if ($('#login-user').val() === user['username']) {
+          if ($('#login-pass').val() === user['password']) {
+            window.sessionStorage.userName = user['displayName']
+            $('#myModal').modal('toggle')
+            clearAllTags()
+            showCookbook()
+            $('.guest').show()
+            $('.user').hide()
+            return
+          }
+        }
+        alert('Incorrect credentials!')
+        return false
+      }
+    })     
+  })
+}
+
+function showCookbook() {
+  $('#show-cookbook').load('html/cookbook.html', function() {
+    populateCookbook()
+  })
+}
+
 // eslint-disable-next-line require-jsdoc
 function userAccessControl() {
+  readDatabase()
   if (window.sessionStorage.userName) {
-    $('.user').hide();
-    $('#nav-addrecipe').on('click', function() {
-
-    })
-    $('#user-greet').text('Hello ' + window.sessionStorage.userName + '!')
-    $('#show-cookbook').load('html/cookbook.html', function() {
-      readDatabase()
-      populateCookbook()
-    })
-  } else {
-    // read database from disk if guest acc
-    selectDB(usersPath, function(response) {
-      window.sessionStorage.setItem('usersData', response)
-    })
-    selectDB(recipesPath, function(response) {
-      window.sessionStorage.setItem('recipesData', response)
-      readDatabase()
-    })
-    $('.guest').hide();
-    $('#user-greet').text('Hello Guest!')
-    $('#greet-guest').load('html/guest.html')
-    $('#login-screen').load('html/login.html', function() {
-      $('#login-form').on('submit', function() {
-        for (user of usersData) {
-          if ($('#login-user').val() === user['username']) {
-            if ($('#login-pass').val() === user['password']) {
-              window.sessionStorage.userName = user['displayName']
-              // window.location.replace('#')
-              return true
-            }
-          }
-          alert('Incorrect credentials!')
-          return false
-        }
-     })     
-    })
+    userLogin()
+    if (!window.sessionStorage['recipePage']) {
+      showCookbook()
+    }
+    else {
+      clearAllTags()
+      recipePage(recipeNum)
+    }
+  } 
+  else {
+    guestLogin()
   }
 }
 
 $(document).ready(function() {
+  loadDatabase()
   $('#nav-temp').load('html/nav.html', userAccessControl)
 });
 

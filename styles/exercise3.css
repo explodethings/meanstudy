@@ -3,8 +3,15 @@ body {
     background-size: cover;
 }
 
-div.recipe-page > div.row > div[class^="col-md-"] > * {
+div.ingridients > div.row > div[class^="col-md-"] > * {
     font-family: 'Times New Roman', Times, serif;
+    background-color: turquoise;
+}
+
+div.instructions > div.row > div[class^="col-md-"] > * {
+    font-family: 'Times New Roman', Times, serif;
+    padding: 0px;
+    background-color: yellowgreen;
 }
 
 img {
