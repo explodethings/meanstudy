@@ -7,13 +7,14 @@ const cookbookColNum = 4
      ,usersPath = 'datasource\\users.json'
      ,recipesPath = 'datasource\\recipes.json'
 
-function loadDatabase() {
+function loadCookbook() {
   selectDB(usersPath, function(response) {
     window.sessionStorage.setItem('usersData', response)
-  })
-  selectDB(recipesPath, function(response) {
-    window.sessionStorage.setItem('recipesData', response)
-    readDatabase()
+    selectDB(recipesPath, function(response) {
+      window.sessionStorage.setItem('recipesData', response)
+      readDatabase()
+      $('#nav-temp').load('html/nav.html', userAccessControl)
+    })
   })
 }
 
@@ -30,12 +31,12 @@ function readDatabase() {
 function selectDB(filePath, callback) {
   var XMLHTTPReq = new XMLHttpRequest()
   XMLHTTPReq.overrideMimeType('application/json')
-  XMLHTTPReq.open('GET', filePath, true)
   XMLHTTPReq.onreadystatechange = function() {
     if (XMLHTTPReq.readyState == 4) {
       callback(XMLHTTPReq.responseText)
     }
   }
+  XMLHTTPReq.open('GET', filePath, false)
   XMLHTTPReq.send(null)
 }
 
@@ -191,53 +192,58 @@ function populateCookbook() {
 }
 
 function clearAllTags() {
-  $('body').children().each(function () {
-    if (!(this.id === 'nav-temp')) {
-      this.innerHTML = ''
-    }
+  $('.site-element').each(function() {
+    $(this).html('')
+  })
+  $('.nav-item').each(function() {
+    $(this).show()
   })
 }
 
 function userLogin() {
-  $('.user').hide();
+  clearAllTags()
+  $('.user').hide()
   $('#user-greet').text('Hello ' + window.sessionStorage.userName + '!')
   $('#nav-addrecipe').on('click', function() {
 
   })
   $('#nav-cookbook').on('click', function() {
-    window.sessionStorage['recipePage'] = ''
-    clearAllTags()
+    userLogin()
     showCookbook()
   })
 }
 
 function pageRedirector() {
-  
+
+}
+
+function loginPage() {
+  $('#login-screen').load('html/login.html', function() {
+    $('#login-form').on('submit', function(e) {
+      for (user of usersData) {
+        if ($('#login-user').val() === user['username'] &&
+            $('#login-pass').val() === user['password']) {
+          $('#myModal').modal('hide').on('hidden.bs.modal', function() {
+            window.sessionStorage.userName = user['displayName']
+            userLogin()
+            showCookbook()
+          })
+        }
+        else {
+          alert('Incorrect credentials!')
+        }
+      }
+     e.preventDefault()
+    })     
+  })
 }
 
 function guestLogin() {
+  clearAllTags()
   $('.guest').hide();
   $('#user-greet').text('Hello Guest!')
   $('#greet-guest').load('html/guest.html')
-  $('#login-screen').load('html/login.html', function() {
-    $('#login-form').on('submit', function() {
-      for (user of usersData) {
-        if ($('#login-user').val() === user['username']) {
-          if ($('#login-pass').val() === user['password']) {
-            window.sessionStorage.userName = user['displayName']
-            $('#myModal').modal('toggle')
-            clearAllTags()
-            showCookbook()
-            $('.guest').show()
-            $('.user').hide()
-            return
-          }
-        }
-        alert('Incorrect credentials!')
-        return false
-      }
-    })     
-  })
+  loginPage()
 }
 
 function showCookbook() {
@@ -248,14 +254,12 @@ function showCookbook() {
 
 // eslint-disable-next-line require-jsdoc
 function userAccessControl() {
-  readDatabase()
   if (window.sessionStorage.userName) {
     userLogin()
     if (!window.sessionStorage['recipePage']) {
       showCookbook()
     }
     else {
-      clearAllTags()
       recipePage(recipeNum)
     }
   } 
@@ -265,7 +269,6 @@ function userAccessControl() {
 }
 
 $(document).ready(function() {
-  loadDatabase()
-  $('#nav-temp').load('html/nav.html', userAccessControl)
+  loadCookbook()
 });
 
