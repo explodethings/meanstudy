@@ -12,7 +12,7 @@
             "url": "http://localhost:8281",
             "port": 9222,
             "webRoot": "${workspaceFolder}/exercise3",
-            "runtimeExecutable": "C:\\Users\\LapKirill\\AppData\\Local\\Chromium\\Application\\chrome.exe",
+            "runtimeExecutable": "C:\\Users\\Kirill\\AppData\\Local\\Chromium\\Application\\chrome.exe",
             "runtimeArgs": [ "--allow-file-access-from-files", "--remote-debugging-port=9222" ]
         }
     ]

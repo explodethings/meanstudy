@@ -137,9 +137,9 @@ function populateCookbook() {
       recipeLink.attr('id', currRecipeNum)
       recipeLink.attr('href', '#')
       recipeLink.on('click', function() {
-        window.sessionStorage['recipePage'] = 'recipePage'
-        recipeNum = $(this).attr('id')
-        recipePage($(this).attr('id'))
+        window.sessionStorage['currentPage'] = 'recipePage'
+        window.sessionStorage['recipeNum'] = $(this).attr('id')
+        recipePage(window.sessionStorage['recipeNum'])
       })
       
       // delete recipe card button
@@ -247,6 +247,7 @@ function guestLogin() {
 }
 
 function showCookbook() {
+  window.sessionStorage['currentPage'] = 'cookbook'
   $('#show-cookbook').load('html/cookbook.html', function() {
     populateCookbook()
   })
@@ -256,11 +257,18 @@ function showCookbook() {
 function userAccessControl() {
   if (window.sessionStorage.userName) {
     userLogin()
-    if (!window.sessionStorage['recipePage']) {
-      showCookbook()
-    }
-    else {
-      recipePage(recipeNum)
+    switch (window.sessionStorage['currentPage'])
+    {
+      case 'recipePage':
+      {
+        recipePage(window.sessionStorage['recipeNum'])
+        break
+      }
+      case 'cookbook':
+      {
+        showCookbook()
+        break
+      }
     }
   } 
   else {
